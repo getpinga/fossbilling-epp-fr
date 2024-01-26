@@ -14,6 +14,8 @@ Start by downloading the latest version of FOSSBilling from the official website
 
 First, download this repository which contains the AFNIC.php file. After successfully downloading the repository, move the AFNIC.php file into the `[FOSSBilling]/library/Registrar/Adapter` directory.
 
+On lines 311 and 312 you will need to put a hardcoded contact ID  for transfer requests. There is no way currently to pass it via FOSSBilling. Just replace the {{ admin }} and {{ tech }} with the chosen contact ID.
+
 ## 3. Activate the Domain Registrar Module:
 
 Within FOSSBilling, go to **System -> Domain Registration -> New Domain Registrar** and activate the new domain registrar.
