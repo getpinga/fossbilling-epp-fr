@@ -893,6 +893,8 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
     {
         $this->getLog()->debug('Enabling Privacy protection: ' . $domain->getName());
         $return = array();
+        $processedContacts = [];
+
         try {
             $s    = $this->connect();
             $this->login();
@@ -928,7 +930,8 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
 
             $contact = array();
             foreach($dcontact as $id) {
-                if (isset($contact[$id])) {
+                // If the contact ID has already been processed, skip the update
+                if (in_array($id, $processedContacts)) {
                     continue;
                 }
                 $from = $to = array();
@@ -963,6 +966,9 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
       </command>
     </epp>');
                 $r = $this->write($xml, __FUNCTION__);
+                
+                // Mark this contact ID as processed to avoid duplicate updates
+                $processedContacts[] = $id;
             }
         }
 
@@ -983,6 +989,8 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
     {
         $this->getLog()->debug('Disabling Privacy protection: ' . $domain->getName());
         $return = array();
+        $processedContacts = [];
+
         try {
             $s    = $this->connect();
             $this->login();
@@ -1018,7 +1026,8 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
 
             $contact = array();
             foreach($dcontact as $id) {
-                if (isset($contact[$id])) {
+                // If the contact ID has already been processed, skip the update
+                if (in_array($id, $processedContacts)) {
                     continue;
                 }
                 $from = $to = array();
@@ -1053,6 +1062,9 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
       </command>
     </epp>');
                 $r = $this->write($xml, __FUNCTION__);
+                
+                // Mark this contact ID as processed to avoid duplicate updates
+                $processedContacts[] = $id;
             }
         }
 
@@ -1162,7 +1174,6 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
 
             $add = array();
             foreach(array(
-                'clientUpdateProhibited',
                 'clientDeleteProhibited',
                 'clientTransferProhibited'
             ) as $st) {
@@ -1176,6 +1187,7 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
                 foreach($add as $st) {
                     $text.= '<domain:status s="' . $st . '" lang="en"></domain:status>' . "\n";
                 }
+                $from = $to = array();
                 $from[] = '/{{ add }}/';
                 $to[] = (empty($text) ? '' : "<domain:add>\n{$text}</domain:add>\n");
                 $from[] = '/{{ name }}/';
@@ -1258,7 +1270,6 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
 
             $rem = array();
             foreach(array(
-                'clientUpdateProhibited',
                 'clientDeleteProhibited',
                 'clientTransferProhibited'
             ) as $st) {
@@ -1272,6 +1283,7 @@ class Registrar_Adapter_AFNIC extends Registrar_AdapterAbstract
                 foreach($rem as $st) {
                     $text.= '<domain:status s="' . $st . '" lang="en"></domain:status>' . "\n";
                 }
+                $from = $to = array();
                 $from[] = '/{{ rem }}/';
                 $to[] = (empty($text) ? '' : "<domain:rem>\n{$text}</domain:rem>\n");
                 $from[] = '/{{ name }}/';
